@@ -140,22 +140,21 @@ void setInitialMomentum(Parameters &parameters, vector<atom> &atoms)
 void setPotentialForcesAndPressure(Parameters &parameters, State &state)
 {
     double N = pow(parameters.n, 3);
+
     state.V = 0;
     state.T = 0;
     state.P = 0;
+
     for(int i = 0; i < N; i++)
     {
         state.atoms[i].F = {0,0,0};
     }
 
-    double rij = 0;
-    coor Fis = {};
-    coor Fip = {};
-
     for(int i = 0; i < N; i++)
     {
         state.V += calcPotentialS(parameters, calcVectorModulus(state.atoms[i].r)); //potencjal od scianek (10)
-        Fis = calcForcesS(parameters, state.atoms[i].r); //sily odpychania od scianek (14)
+
+        coor Fis = calcForcesS(parameters, state.atoms[i].r); //sily odpychania od scianek (14)
         state.atoms[i].F = addVectors(state.atoms[i].F, Fis ); //akumulacja do F
         state.P += calcVectorModulus(Fis) / 4. / M_PI / parameters.L / parameters.L; //akumulacja cisnienia chwilowego (15)
 
@@ -163,9 +162,9 @@ void setPotentialForcesAndPressure(Parameters &parameters, State &state)
         {
             for(int j = 0; j < i; j++)
             {
-                rij = calcVectorModulus( subtractVectors(state.atoms[i].r, state.atoms[j].r));
+                double rij = calcVectorModulus( subtractVectors(state.atoms[i].r, state.atoms[j].r));
                 state.V += calcPotentialP(parameters, rij); //obliczanie potencjalu par (9) i akumulacja do V
-                Fip = calcForcesP(parameters, state.atoms[i].r, state.atoms[j].r); //obliczanie sil miedzyatomowych
+                coor Fip = calcForcesP(parameters, state.atoms[i].r, state.atoms[j].r); //obliczanie sil miedzyatomowych
                 state.atoms[i].F = addVectors(state.atoms[i].F, Fip); //  akumulacja do Fi
                 state.atoms[j].F = addVectors(state.atoms[j].F, calcOppositeVector(Fip)); // akuulacja do Fj
             }
@@ -186,7 +185,7 @@ double calcPotentialP(Parameters &parameters, double rij)
 {
     double rRatio = parameters.R / rij;
 
-    return parameters.e * (pow( rRatio , 12 ) - 2.0 * pow(rRatio, 6) );
+    return parameters.e * (pow( rRatio , 12 ) - 2 * pow(rRatio, 6) );
 }
 
 coor calcForcesP(Parameters &parameters, coor ri, coor rj)
@@ -195,9 +194,11 @@ coor calcForcesP(Parameters &parameters, coor ri, coor rj)
     double rij = calcVectorModulus( riMinusrj );
     double rRatio = parameters.R/rij;
 
-    double A = 12. * parameters.e * (pow( rRatio , 12 ) - pow(rRatio, 6) ) / (rij * rij);
+    double A = 12 * parameters.e * (pow( rRatio , 12 ) - pow(rRatio, 6) ) / (rij * rij);
 
-    coor Fij = {A * riMinusrj.x, A * riMinusrj.x, A * riMinusrj.x};
+    coor Fij = {A * riMinusrj.x,
+                A * riMinusrj.y,
+                A * riMinusrj.z};
 
     return Fij;
 }
