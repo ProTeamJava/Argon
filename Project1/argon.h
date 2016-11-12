@@ -5,85 +5,86 @@
  *      Author: mongos
  */
 
-#ifndef ARGON_H_
-#define ARGON_H_
+#pragma once
 
-
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <vector>
 
 using namespace std;
 
 struct coor
 {
-	double x;
-	double y;
-	double z;
+    double x;
+    double y;
+    double z;
 };
 
 struct atom
 {
-	coor r;
-	coor p;
-	coor E;
-	coor F;
-	
+    coor r;
+    coor p;
+    coor E;
+    coor F;
+
 };
 
-struct parameters
+struct Parameters
 {
-	double n;
-	double m;
-	double e;
-	double R;
-	double f;
-	double L;
-	double a;
-	double T_0;
-	double tau;
-	double S_0;
-	double S_d;
-	int S_out;
-	int S_xyz;
+    double n;
+    double m;
+    double e;
+    double R;
+    double f;
+    double L;
+    double a;
+    double T_0;
+    double tau;
+    double S_0;
+    double S_d;
+    int S_out;
+    int S_xyz;
 };
 
-struct state
+struct State
 {
-	double V;
-	double P;
-	double H;
-	double T;
-	vector<atom> atoms; 
+    double V;
+    double P;
+    double H;
+    double T;
+    vector<atom> atoms;
 };
 
-parameters getParameters(string inputFileName);
+Parameters getParameters(string inputFileName);
 
-void setInitialState(parameters &parameters, state & state);
-void setInitialLocation(parameters &parameters, vector<atom> & atoms);
-void setInitialEnergies(parameters &parameters, vector<atom> & atoms);
-void setInitialMomentum(parameters &parameters, vector<atom> & atoms);
-void setPotentialForcesAndPressure(parameters &parameters, state & state);
-double calcPotentialS(parameters &parameters, double ri);
-double calcPotentialP(parameters &parameters, double rij);
-coor calcForcesP(parameters &parameters, coor ri, coor rj);
-coor calcForcesS(parameters &parameters, coor ri);
+void setInitialState(Parameters &Parameters, State & state);
+void setInitialLocation(Parameters &Parameters, vector<atom> &atoms);
+void setInitialEnergies(Parameters &Parameters, vector<atom> &atoms);
+void setInitialMomentum(Parameters &Parameters, vector<atom> &atoms);
 
-void simulate(parameters &parameters, state & state, ofstream & outputFileXYZ, ofstream & outputFileChar);
+void setPotentialForcesAndPressure(Parameters &Parameters, State & state);
 
-void updateState(parameters &parameters, state & state);
-void setEnergyAndTemperature(parameters &parameters, state & state);
+double calcPotentialS(Parameters &Parameters, double ri);
+double calcPotentialP(Parameters &Parameters, double rij);
+coor calcForcesP(Parameters &Parameters, coor ri, coor rj);
+coor calcForcesS(Parameters &Parameters, coor ri);
+
+void simulate(Parameters &Parameters, State &state,
+              ofstream &outputFileXYZ, ofstream &outputFileChar);
+
+void updateState(Parameters &Parameters, State & state);
+void setEnergyAndTemperature(Parameters &Parameters, State & state);
 
 double getUniRandom();
 int getPlusOrMinus();
+
 double calcVectorModulus(coor vector);
 coor subtractVectors(coor v1, coor v2);
 coor addVectors(coor v1, coor v2);
 coor calcOppositeVector(coor v);
 
-void outputXYZ(vector<atom> & atoms, ofstream & outputFile);
-void outputChar(state & state, ofstream & outputFile, double & t);
-void outputMomentum(vector<atom> & atoms);
+void outputXYZ(vector<atom> &atoms, ofstream &outputFile);
+void outputChar(State &state, ofstream &outputFile, double &t);
+void outputMomentum(vector<atom> &atoms);
 
-#endif /* ARGON_H_ */

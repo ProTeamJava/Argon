@@ -7,27 +7,26 @@
 
 #include "argon.h"
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* /* argv */[])
 {
-state state;
+    State state;
+    Parameters parameters = getParameters("data.txt");
+    setInitialState(parameters, state);
 
-parameters parameters = getParameters("data2.txt");
-setInitialState(parameters, state); 
+    ofstream outputFileXYZ;
+    ofstream outputFileChar;
+    outputFileXYZ.open("output.xyz");
+    outputFileChar.open("output.txt");
+    outputFileChar << "t" << "\t" << "H" << "\t" << "V" << "\t" << "T" << "\t " << "P" << endl;
+    outputXYZ(state.atoms, outputFileXYZ);
+    outputMomentum(state.atoms);
 
-ofstream outputFileXYZ;
-ofstream outputFileChar;
-outputFileXYZ.open("output.xyz");
-outputFileChar.open("output.txt");
-outputFileChar << "t" << "\t" << "H" << "\t" << "V" << "\t" << "T" << "\t " << "P" << endl;
-outputXYZ(state.atoms, outputFileXYZ);
-outputMomentum(state.atoms);
+    simulate(parameters, state, outputFileXYZ, outputFileChar);
 
-simulate(parameters, state, outputFileXYZ, outputFileChar);
+    outputFileXYZ.close();
+    outputFileChar.close();
 
-outputFileXYZ.close();
-outputFileChar.close();
-
-return 0;
+    return 0;
 }
 
 
